@@ -22,7 +22,7 @@
      3) Shu email/parolni pastga yozing
 ============================================================ */
 
-const API_BASE = "https://xxxx.ngrok-free.app/api/v1";
+const API_BASE = "http://localhost:8081/api/v1";
 
 const GUEST_CREDENTIALS = {
   email: "guest.streambox@example.com", // <-- shu yerga o'zingiz yaratgan demo hisobning emailini yozing

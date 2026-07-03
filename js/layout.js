@@ -48,11 +48,54 @@ function renderAuthUI() {
     }
   }
 
+  upgradeCreateButton();
   wireUploadButton();
   wireMyChannelItem();
   wireSubsNavItem();
   wireBell();
+  renderSidebarSubscriptions();
 }
+
+/** Yuklash tugmasini ikonkadan "+ Yaratish" pill tugmasiga aylantiradi (YouTube'dagidek) */
+function upgradeCreateButton() {
+  const btn = document.getElementById("uploadBtn");
+  if (!btn || btn.dataset.upgraded) return;
+  btn.dataset.upgraded = "1";
+  btn.className = "btn-create";
+  btn.innerHTML = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+    <span data-i18n="upload_title">Yaratish</span>`;
+  applyI18n();
+}
+
+/** Chap paneldagi "Obunalar" ostiga haqiqiy obuna bo'lingan kanallarni chiqaradi */
+async function renderSidebarSubscriptions() {
+  const mount = document.getElementById("sidebarSubscriptions");
+  if (!mount) return;
+
+  if (!isLoggedIn()) {
+    mount.innerHTML = `<div class="sidebar-sub-empty">Kanallarni ko'rish uchun tizimga kiring</div>`;
+    return;
+  }
+
+  try {
+    const list = await apiRequest("/subscription/get/list", { mode: "user" });
+    if (!list || list.length === 0) {
+      mount.innerHTML = `<div class="sidebar-sub-empty">Hali hech kimga obuna bo'lmagansiz</div>`;
+      return;
+    }
+    mount.innerHTML = list.slice(0, 8).map((s) => {
+      const ch = s.channel || {};
+      const photo = ch.photoUrl ? attachUrl(ch.photoUrl) : "img/placeholder.svg";
+      return `
+        <a href="channel.html?id=${ch.id}" class="sidebar-sub-item">
+          <img src="${photo}" onerror="this.src='img/placeholder.svg'">
+          <span>${escapeHtml(ch.name)}</span>
+        </a>`;
+    }).join("");
+  } catch (err) {
+    mount.innerHTML = "";
+  }
 
 /* ---------------- Hisob menyusi (avatar bosilganda) ---------------- */
 function toggleAccountMenu(profile) {
