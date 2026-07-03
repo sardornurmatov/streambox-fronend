@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emailni tasdiqlash — StreamBox</title>
+<meta name="description" content="StreamBox hisobingizni faollashtirish uchun emailingizga yuborilgan kodni kiriting.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-visual">
+    <div class="scanline"></div>
+    <div class="logo">
+      <div class="logo-mark"></div>
+      StreamBox
+    </div>
+    <h1>Emailingizni<br>tekshiring.</h1>
+    <p>Sizga yuborilgan 6 xonali kodni kiriting. Kod kelmadimi? Qayta yuborishingiz mumkin.</p>
+  </div>
+
+  <div class="auth-form-col">
+    <div class="auth-card">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        StreamBox
+      </div>
+      <h2>Kodni tasdiqlang</h2>
+      <p class="sub" id="emailHint">Emailingizga yuborilgan kodni kiriting</p>
+
+      <div id="formMsg" class="form-msg"></div>
+
+      <form id="verifyForm">
+        <div class="code-inputs">
+          <input type="text" maxlength="1" class="code-digit">
+          <input type="text" maxlength="1" class="code-digit">
+          <input type="text" maxlength="1" class="code-digit">
+          <input type="text" maxlength="1" class="code-digit">
+          <input type="text" maxlength="1" class="code-digit">
+          <input type="text" maxlength="1" class="code-digit">
+        </div>
+        <button type="submit" class="btn-primary" id="submitBtn">Tasdiqlash</button>
+      </form>
+
+      <p class="auth-alt">Kod kelmadimi? <a href="#" id="resendLink">Qayta yuborish</a></p>
+    </div>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

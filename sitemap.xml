@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://streambox.uz/home.html</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <!--
+    Har bir video sahifasi uchun shu tarzda qator qo'shib boring
+    (buni kelajakda backend orqali avtomatik generatsiya qilish mumkin bo'ladi):
+
+    <url>
+      <loc>https://streambox.uz/video.html?id=VIDEO_ID</loc>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+  -->
+</urlset>
