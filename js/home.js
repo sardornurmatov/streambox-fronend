@@ -73,7 +73,7 @@ async function loadCategories() {
 
     if (categories.length > 0) firstCategoryId = categories[0].id;
   } catch (err) {
-    categoriesRow.innerHTML = "";
+    categoriesRow.innerHTML = `<span style="color:var(--danger);font-size:13px;">Kategoriyalarni yuklashda xatolik: ${escapeHtml(err.message)}</span>`;
   }
 }
 

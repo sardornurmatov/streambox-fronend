@@ -10,6 +10,74 @@ const channelWrap = document.getElementById("channelWrap");
 const params = new URLSearchParams(window.location.search);
 const channelId = params.get("id");
 
+let currentChannel = null;
+let editPhotoId = null;
+let editBannerId = null;
+
+function wireFileDrop(dropId, inputId, onUploaded) {
+  const drop = document.getElementById(dropId);
+  const input = document.getElementById(inputId);
+  if (!drop || !input) return;
+  drop.addEventListener("click", () => input.click());
+  input.addEventListener("change", async () => {
+    const file = input.files[0];
+    if (!file) return;
+    const label = drop.querySelector("span");
+    label.textContent = "Yuklanmoqda...";
+    try {
+      const attach = await uploadFile(file);
+      onUploaded(attach.id);
+      drop.classList.add("has-file");
+      label.textContent = file.name;
+    } catch (err) {
+      label.textContent = "Xatolik: " + err.message;
+    }
+  });
+}
+
+function openEditPanel() {
+  if (!currentChannel) return;
+  document.getElementById("channelWrap").style.display = "none";
+  const panel = document.getElementById("editChannelPanel");
+  panel.style.display = "block";
+  document.getElementById("editName").value = currentChannel.name || "";
+  document.getElementById("editDescription").value = currentChannel.description || "";
+  editPhotoId = null;
+  editBannerId = null;
+}
+
+function closeEditPanel() {
+  document.getElementById("channelWrap").style.display = "block";
+  document.getElementById("editChannelPanel").style.display = "none";
+}
+
+wireFileDrop("editPhotoDrop", "editPhotoInput", (id) => (editPhotoId = id));
+wireFileDrop("editBannerDrop", "editBannerInput", (id) => (editBannerId = id));
+
+document.getElementById("cancelEditBtn").addEventListener("click", closeEditPanel);
+
+document.getElementById("saveChannelBtn").addEventListener("click", async () => {
+  const msg = document.getElementById("editFormMsg");
+  try {
+    await apiRequest("/channel/update", {
+      method: "PUT",
+      mode: "user",
+      body: {
+        id: currentChannel.id,
+        name: document.getElementById("editName").value.trim(),
+        description: document.getElementById("editDescription").value.trim(),
+        photoId: editPhotoId,
+        bannerId: editBannerId,
+      },
+    });
+    closeEditPanel();
+    render();
+  } catch (err) {
+    msg.className = "form-msg error";
+    msg.textContent = err.message || "Saqlashda xatolik";
+  }
+});
+
 function renderVideoCard(v) {
   const thumb = attachUrl(v.preview && v.preview.id);
   return `
@@ -32,6 +100,17 @@ function renderVideoCard(v) {
   `;
 }
 
+async function deleteChannel() {
+  if (!confirm("Kanalni o'chirmoqchimisiz? Bu amalni orqaga qaytarib bo'lmaydi.")) return;
+  try {
+    await apiRequest(`/channel/${channelId}`, { method: "DELETE", mode: "user" });
+    alert("Kanal o'chirildi");
+    window.location.href = "home.html";
+  } catch (err) {
+    alert("Xatolik: " + err.message);
+  }
+}
+
 async function subscribe() {
   if (!isLoggedIn()) { goToLogin(); return; }
   try {
@@ -49,6 +128,7 @@ async function render() {
   }
   try {
     const ch = await apiRequest(`/channel/get/by/id/${channelId}`, { mode: "public" });
+    currentChannel = ch;
     document.title = `${ch.name} — StreamBox`;
     document.getElementById("pageTitle").textContent = document.title;
 
@@ -68,7 +148,9 @@ async function render() {
         </div>
         <div class="actions">
           ${isOwner
-            ? `<button class="btn-ghost" onclick="window.location.href='upload.html'">+ ${t("upload_title")}</button>`
+            ? `<button class="btn-ghost" id="editChannelBtn">Tahrirlash</button>
+               <button class="btn-ghost" onclick="window.location.href='upload.html'">+ ${t("upload_title")}</button>
+               <button class="btn-ghost" id="deleteChannelBtn" style="color:var(--danger);border-color:var(--danger);">O'chirish</button>`
             : `<button class="btn-subscribe" id="subscribeBtn">${t("subscribe")}</button>`}
         </div>
       </div>
@@ -78,7 +160,10 @@ async function render() {
       <div class="video-grid" id="channelVideoGrid" style="padding:0;">${videosHtml}</div>
     `;
 
-    if (!isOwner) {
+    if (isOwner) {
+      document.getElementById("editChannelBtn").addEventListener("click", openEditPanel);
+      document.getElementById("deleteChannelBtn").addEventListener("click", deleteChannel);
+    } else {
       document.getElementById("subscribeBtn").addEventListener("click", subscribe);
     }
 

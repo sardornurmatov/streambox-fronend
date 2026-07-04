@@ -34,17 +34,23 @@ function renderAuthUI() {
   }
 
   if (authNavGroup) {
-    authNavGroup.innerHTML = profile
-      ? `<a href="#" class="nav-item" id="logoutBtn">
+    if (profile) {
+      authNavGroup.innerHTML = `
+         ${profile.role === "ROLE_ADMIN" ? `
+         <a href="admin-categories.html" class="nav-item">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+           Admin: Kategoriyalar
+         </a>` : ""}
+         <a href="#" class="nav-item" id="logoutBtn">
            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
            Chiqish
-         </a>`
-      : `<a href="index.html" class="nav-item">
+         </a>`;
+      document.getElementById("logoutBtn").addEventListener("click", (e) => { e.preventDefault(); logout(); });
+    } else {
+      authNavGroup.innerHTML = `<a href="index.html" class="nav-item">
            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
            Kirish
          </a>`;
-    if (profile) {
-      document.getElementById("logoutBtn").addEventListener("click", (e) => { e.preventDefault(); logout(); });
     }
   }
 
@@ -53,7 +59,19 @@ function renderAuthUI() {
   wireMyChannelItem();
   wireSubsNavItem();
   wireBell();
+  wireHamburger();
   renderSidebarSubscriptions();
+}
+
+/** Yuqoridagi ☰ tugmasi bosilganda chap panelni yopadi/ochadi (barcha sahifalarda ishlaydi) */
+function wireHamburger() {
+  const btn = document.querySelector(".hamburger-btn");
+  const sidebar = document.querySelector(".sidebar");
+  if (!btn || !sidebar || btn.dataset.wired) return;
+  btn.dataset.wired = "1";
+  btn.addEventListener("click", () => {
+    sidebar.classList.toggle("sidebar-hidden");
+  });
 }
 
 /** Yuklash tugmasini ikonkadan "+ Yaratish" pill tugmasiga aylantiradi (YouTube'dagidek) */
@@ -96,6 +114,7 @@ async function renderSidebarSubscriptions() {
   } catch (err) {
     mount.innerHTML = "";
   }
+}
 
 /* ---------------- Hisob menyusi (avatar bosilganda) ---------------- */
 function toggleAccountMenu(profile) {
@@ -118,6 +137,10 @@ function toggleAccountMenu(profile) {
     <a href="#" class="account-menu-item" id="accountMenuChannel">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
       Mening kanalim
+    </a>
+    <a href="settings.html" class="account-menu-item">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33h0a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51h0a1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v0a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Sozlamalar
     </a>
     <a href="#" class="account-menu-item" id="accountMenuLogout">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>

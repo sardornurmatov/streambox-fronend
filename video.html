@@ -47,6 +47,9 @@
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
+        <button class="hamburger-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
         <div class="logo"><div class="logo-mark"></div>StreamBox</div>
       </div>
       <div class="topbar-center">
@@ -69,6 +72,36 @@
 
     <div class="watch-wrap" id="watchWrap">
       <div class="loading-state" data-i18n="loading">Yuklanmoqda...</div>
+    </div>
+
+    <div class="form-page" id="editVideoPanel" style="display:none; max-width:640px;">
+      <h1>Videoni tahrirlash</h1>
+      <div class="form-card">
+        <div id="editVideoMsg" class="form-msg"></div>
+        <div class="field">
+          <label>Video sarlavhasi</label>
+          <input type="text" id="editVideoTitle">
+        </div>
+        <div class="field">
+          <label>Tavsif</label>
+          <textarea id="editVideoDescription"></textarea>
+        </div>
+        <div class="field">
+          <label>Kategoriya</label>
+          <select id="editVideoCategory"></select>
+        </div>
+        <div class="field">
+          <label>Muqova rasmi (o'zgartirish uchun yangi fayl tanlang, aks holda eskisi qoladi)</label>
+          <div class="file-drop" id="editPreviewDrop">
+            <span>Faylni tanlang yoki shu yerga tashlang</span>
+            <input type="file" id="editPreviewInput" accept="image/*">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-primary" id="saveVideoBtn">Saqlash</button>
+          <button class="btn-ghost" id="cancelEditVideoBtn">Bekor qilish</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

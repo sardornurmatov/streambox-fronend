@@ -119,11 +119,19 @@ async function apiRequest(path, { method = "GET", body = null, mode = "public" }
 
   let data = null;
   const text = await res.text();
-  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  let isJson = true;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; isJson = false; }
 
   if (!res.ok) {
-    const message = (data && data.message) ? data.message : (typeof data === "string" ? data : "Xatolik yuz berdi");
+    let message;
+    if (data && data.message) message = data.message;
+    else if (data && data.error) message = `${data.error} (status ${res.status})`;
+    else if (typeof data === "string" && data.trim()) message = `${data.slice(0, 200)} (status ${res.status})`;
+    else message = `Server ${res.status} status qaytardi (tafsilotsiz)`;
     throw new Error(message);
+  }
+  if (!isJson && typeof data === "string" && data.trim().startsWith("<")) {
+    throw new Error("Server JSON o'rniga HTML qaytardi (ngrok ogohlantirish sahifasi bo'lishi mumkin). API_BASE manzilini tekshiring.");
   }
   return data;
 }

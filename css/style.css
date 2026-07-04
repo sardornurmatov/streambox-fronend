@@ -222,6 +222,13 @@ input, textarea { font-family: inherit; }
   top: 0;
   height: 100vh;
   flex-shrink: 0;
+  transition: margin-left .18s ease, opacity .18s ease;
+  overflow-y: auto;
+}
+.sidebar.sidebar-hidden {
+  margin-left: calc(-1 * var(--sidebar-w));
+  opacity: 0;
+  pointer-events: none;
 }
 .sidebar .logo { padding: 0 8px; margin-bottom: 28px; }
 .nav-group { margin-bottom: 22px; }

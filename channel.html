@@ -34,6 +34,9 @@
   <div class="main">
     <div class="topbar">
       <div class="topbar-left">
+        <button class="hamburger-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+        </button>
         <div class="logo"><div class="logo-mark"></div>StreamBox</div>
       </div>
       <div class="topbar-center">
@@ -56,6 +59,39 @@
 
     <div class="watch-wrap" id="channelWrap">
       <div class="loading-state" data-i18n="loading">Yuklanmoqda...</div>
+    </div>
+
+    <div class="form-page" id="editChannelPanel" style="display:none; max-width:640px;">
+      <h1>Kanalni tahrirlash</h1>
+      <div class="form-card">
+        <div id="editFormMsg" class="form-msg"></div>
+        <div class="field">
+          <label>Kanal nomi</label>
+          <input type="text" id="editName">
+        </div>
+        <div class="field">
+          <label>Kanal haqida</label>
+          <textarea id="editDescription"></textarea>
+        </div>
+        <div class="field">
+          <label>Profil rasmi (o'zgartirish uchun yangi fayl tanlang, aks holda eskisi qoladi)</label>
+          <div class="file-drop" id="editPhotoDrop">
+            <span>Faylni tanlang yoki shu yerga tashlang</span>
+            <input type="file" id="editPhotoInput" accept="image/*">
+          </div>
+        </div>
+        <div class="field">
+          <label>Fon rasmi (banner) — ixtiyoriy</label>
+          <div class="file-drop" id="editBannerDrop">
+            <span>Faylni tanlang yoki shu yerga tashlang</span>
+            <input type="file" id="editBannerInput" accept="image/*">
+          </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-primary" id="saveChannelBtn">Saqlash</button>
+          <button class="btn-ghost" id="cancelEditBtn">Bekor qilish</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

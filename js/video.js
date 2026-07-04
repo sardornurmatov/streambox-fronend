@@ -21,6 +21,93 @@ const params = new URLSearchParams(window.location.search);
 const videoId = params.get("id");
 const sessionComments = [];
 
+let currentVideo = null;
+let editPreviewId = null;
+
+function wireEditFileDrop() {
+  const drop = document.getElementById("editPreviewDrop");
+  const input = document.getElementById("editPreviewInput");
+  drop.addEventListener("click", () => input.click());
+  input.addEventListener("change", async () => {
+    const file = input.files[0];
+    if (!file) return;
+    const label = drop.querySelector("span");
+    label.textContent = "Yuklanmoqda...";
+    try {
+      const attach = await uploadFile(file);
+      editPreviewId = attach.id;
+      drop.classList.add("has-file");
+      label.textContent = file.name;
+    } catch (err) {
+      label.textContent = "Xatolik: " + err.message;
+    }
+  });
+}
+wireEditFileDrop();
+
+async function openEditVideoPanel() {
+  if (!currentVideo) return;
+  document.getElementById("watchWrap").style.display = "none";
+  document.getElementById("editVideoPanel").style.display = "block";
+  document.getElementById("editVideoTitle").value = currentVideo.title || "";
+  document.getElementById("editVideoDescription").value = currentVideo.description || "";
+  editPreviewId = currentVideo.preview ? currentVideo.preview.id : null;
+
+  const select = document.getElementById("editVideoCategory");
+  try {
+    const categories = await apiRequest("/category", { mode: "public" });
+    select.innerHTML = categories.map((c) =>
+      `<option value="${c.id}" ${currentVideo.category && currentVideo.category.id === c.id ? "selected" : ""}>${escapeHtml(c.name)}</option>`
+    ).join("");
+  } catch (err) {
+    select.innerHTML = `<option value="">—</option>`;
+  }
+}
+
+function closeEditVideoPanel() {
+  document.getElementById("watchWrap").style.display = "block";
+  document.getElementById("editVideoPanel").style.display = "none";
+}
+
+document.getElementById("cancelEditVideoBtn").addEventListener("click", closeEditVideoPanel);
+
+document.getElementById("saveVideoBtn").addEventListener("click", async () => {
+  const msg = document.getElementById("editVideoMsg");
+  try {
+    await apiRequest(`/video/update/detail/${videoId}`, {
+      method: "PUT",
+      mode: "user",
+      body: {
+        title: document.getElementById("editVideoTitle").value.trim(),
+        description: document.getElementById("editVideoDescription").value.trim(),
+        categoryId: Number(document.getElementById("editVideoCategory").value),
+        previewAttachId: editPreviewId,
+        status: "PUBLIC",
+      },
+    });
+    closeEditVideoPanel();
+    render();
+  } catch (err) {
+    msg.className = "form-msg error";
+    msg.textContent = err.message || "Saqlashda xatolik";
+  }
+});
+
+async function checkIsOwnerAndWireEdit(v) {
+  if (!isLoggedIn() || !v.channel) return;
+  try {
+    const channels = await apiRequest("/channel/get/list/owner", { mode: "user" });
+    const owns = channels && channels.some((c) => c.id === v.channel.id);
+    if (owns) {
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn-ghost";
+      editBtn.textContent = "Tahrirlash";
+      editBtn.addEventListener("click", openEditVideoPanel);
+      document.getElementById("subscribeBtn").replaceWith(editBtn);
+    }
+  } catch (err) { /* jimgina o'tkazib yuboramiz */ }
+}
+
 async function increaseView() {
   try { await apiRequest(`/video/increase/view-count/${videoId}`, { method: "PUT", mode: "public" }); }
   catch (err) { /* jimgina o'tkazib yuboramiz */ }
@@ -91,6 +178,7 @@ async function render() {
   }
   try {
     const v = await apiRequest(`/video/get/by-id/${videoId}`, { mode: "public" });
+    currentVideo = v;
     const like = v.likeInfo || { likeCount: 0, dislikeCount: 0, isUserLiked: false, isUserDisliked: false };
     const channelPhoto = v.channel && v.channel.photoUrl ? attachUrl(v.channel.photoUrl) : "img/placeholder.svg";
 
@@ -156,6 +244,7 @@ async function render() {
     document.getElementById("subscribeBtn").addEventListener("click", () => subscribe(v.channel.id));
     document.getElementById("commentSubmitBtn").addEventListener("click", postComment);
     renderComments();
+    checkIsOwnerAndWireEdit(v);
   } catch (err) {
     watchWrap.innerHTML = `<div class="empty-state">Xatolik: ${escapeHtml(err.message)}</div>`;
   }
